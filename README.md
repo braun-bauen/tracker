@@ -1,6 +1,5 @@
-# Project tracker
-
-One Paragraph of project description goes here
+# Braun Bauen Tracker
+A simple time tracking and invoicing application. Written in Go and TypeScript.
 
 ## Getting Started
 
