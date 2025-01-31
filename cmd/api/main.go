@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
 	"tracker/internal/server"
 )
 
@@ -36,8 +36,22 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	done <- true
 }
 
-func main() {
+// Sets the logging output to append to the logs.txt file
+// and adds flag for log file location.
+// Creates the file if it doesn't exist.
+func initLogger() {
+	// If the file doesn't exist, create it or append to the file
+	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+  log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	log.SetOutput(file)
+}
+
+func main() {
+	initLogger()
 	server := server.NewServer()
 
 	// Create a done channel to signal when the shutdown is complete
@@ -46,10 +60,13 @@ func main() {
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, done)
 
+	// Start server
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
+		log.Printf("Http server error: %v", err)
 		panic(fmt.Sprintf("http server error: %s", err))
 	}
+  log.Println("Server started");
 
 	// Wait for the graceful shutdown to complete
 	<-done

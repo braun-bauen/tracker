@@ -25,6 +25,9 @@ tmp/
 # .env file
 .env
 
+# Logging file
+logs.txt
+
 # Project build
 main
 *templ.go
